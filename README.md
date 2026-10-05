@@ -53,46 +53,6 @@ dsh plugin --profile desktop remove dsh-sovits-widget   # 自动同步 bundles
 
 插件更新或大改配置前，旧配置都会自动备份到 `$DSH_HOME/sovits/dsh-tts-config.json.bak-<时间戳>`（保留最近 5 份），可在插件“诊断”页一键回滚。
 
-## 分发与安装（给别人使用）
-
-**对方机器要求**：已安装 DeepSeek Harness 桌面版；有一份可用的 GPT-SoVITS（任意部署，含 `api_v2.py`，本地或远程均可）；**不需要** Node/开发环境（构建产物已内置在压缩包）。
-
-**第一步：打包**。压缩本项目目录（构建产物 `lib/`、`assets/` 已包含；`node_modules/` 不包含），例如得到 `dsh-sovits-widget-0.1.0-dist.zip`。已发布到 npm 的话可跳过打包。
-
-**第二步：安装**（两种方式任选）：
-
-方式 A（官方 CLI，对方有 `dsh` 命令时）：
-```sh
-dsh plugin --profile desktop add link:D:/dsh-sovits-widget   # 桌面版
-dsh plugin --profile web add link:D:/dsh-sovits-widget       # 纯 web 版
-# 或已发布到 npm：
-dsh plugin --profile desktop add dsh-sovits-widget
-```
-
-方式 B（手动，对已安装的桌面版通用，本机即用此法）：
-1. 解压到固定目录，如 `D:\dsh-sovits-widget`；
-2. 打开 profile 目录 `%USERPROFILE%\.dsh\profiles\desktop`（web 版为 `profiles\web`）；
-3. 备份 `package.json`（如 `package.json.bak`）；
-4. 编辑 `package.json`：`dependencies` 增加 `"dsh-sovits-widget": "link:D:/dsh-sovits-widget"`，`dsh.profile.bundles` 追加 `"dsh-sovits-widget"`；
-5. 在 profile 目录执行（dsh 自带运行时，路径随安装位置，本机为）：
-   ```bat
-   "%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe" ^
-     "%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\pnpm\bin\pnpm.mjs" install
-   ```
-6. 完全重启 dsh。
-
-注意：pnpm 对刚发布的新包有 `minimumReleaseAge` 供应链保护，从 registry 安装全新版本可能被拒；可在 profile 的 `pnpm-workspace.yaml` 里给该包加 `minimumReleaseAgeExclude`（参考本机对 `dsh-whale-widget` 的写法）。
-
-**第三步：对方首次配置**：
-1. 重启后点右下角 🔊 →「高级参数」：填对方 GPT-SoVITS 的 `api_v2.py` 绝对路径、python 可执行文件、工作目录，开启“自动拉起”（或不开，由对方自行启动服务）；
-2. 「音色管理」→ 新建角色：选对方的参考音频（或上传自动降噪截取 3-10 秒）、填提示文本；
-3. 启用角色 →「基础设置」打开自动播报。
-
-**常见坑（已在真实环境踩过）**：
-- GPT-SoVITS 的 `tts_infer.yaml` 里权重路径必须是**文件**（如 `GPT_weights_v2ProPlus/xxx.ckpt`），不是目录；webui 换模型时可能把它写坏，导致服务启动即崩；
-- 模型加载约 1 分钟，期间面板显示“正在加载模型…”，合成会自动重试等待；
-- 若对方经常重启 dsh，建议用 `scripts/start-sovits.bat`（或放入启动文件夹）让服务常驻，插件会检测并复用。
-
 ## 快速上手
 
 1. 启动 GPT-SoVITS API（以 v2pro 整合包为例）：
