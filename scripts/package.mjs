@@ -40,7 +40,7 @@ const RUNTIME_ENTRIES = [
   'LICENSE',
   'README.md',
   'INSTALL.md',
-  'BEGINNER-GUIDE.md',
+  '新手安装指南.md',
 ];
 
 /** 仅开发包包含。 */
@@ -136,16 +136,30 @@ if (!devMode && !existsSync(join(stageDir, 'scripts/start-sovits.bat'))) {
 const fileCount = countFiles(stageDir);
 
 if (existsSync(outFile)) rmSync(outFile, { force: true });
-const ps = spawnSync(
-  'powershell.exe',
-  [
-    '-NoProfile',
-    '-NonInteractive',
-    '-Command',
-    `Compress-Archive -Path '${stageDir}' -DestinationPath '${outFile}' -CompressionLevel Optimal -Force`,
-  ],
-  { encoding: 'utf8' },
-);
+
+// 用 .NET ZipFile 打包：它会为非 ASCII 文件名写入 UTF-8 标志位（0x800），
+// 这是 GitHub 附件处理与跨系统解压正确还原中文文件名的前提。
+// PowerShell 的 Compress-Archive 不写该标志，会导致中文名乱码 / 上传失败。
+const psScript = `
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$archive = [System.IO.Compression.ZipFile]::Open('${outFile.replace(/'/g, "''")}', [System.IO.Compression.ZipArchiveMode]::Create)
+try {
+  $root = '${stageDir.replace(/'/g, "''")}'
+  $rootName = Split-Path $root -Leaf
+  Get-ChildItem -Path $root -Recurse -File | ForEach-Object {
+    $rel = $_.FullName.Substring($root.Length).TrimStart([char]92, [char]47)
+    $entryName = $rootName + '/' + $rel.Replace([char]92, [char]47)
+    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $entryName, [System.IO.Compression.CompressionLevel]::Optimal)
+  }
+} finally {
+  $archive.Dispose()
+}
+`;
+const ps = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', psScript], {
+  encoding: 'utf8',
+});
 if (ps.status !== 0) {
   console.error('压缩失败:', ps.stderr || ps.stdout);
   process.exit(1);
