@@ -1,0 +1,27 @@
+# 依赖与构建缓存
+node_modules/
+dist-types/
+.vitest/
+coverage/
+
+# 构建产物：不入库，clone 后运行 pnpm build 生成
+lib/
+assets/sovits-widget.js
+
+# 本机专用文件（含本机绝对路径 / 用户名 / 测试残留，不入库）
+scripts/loader-check.cjs
+scripts/preconfig.mjs
+scripts/align-reference.mjs
+scripts/fix-role-weights.mjs
+preview-body.json
+tts-test-body.json
+tts-test-output.wav
+tts-verify.wav
+tts-verify-body.json
+
+# 其他
+*.log
+.DS_Store
+Thumbs.db
+*-dist.zip
+.*-stage/

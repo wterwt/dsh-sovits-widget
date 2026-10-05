@@ -1,0 +1,52 @@
+{
+  "name": "dsh-sovits-widget",
+  "version": "0.1.0",
+  "description": "dsh 适配插件：GPT-SoVITS 语音播报引擎（角色提示词注入、文本清洗分段、并发合成队列、LRU 缓存、Web Audio 流式播放与打断、音色管理/情感映射/音色混合、进程池与健康检查、Web Speech 降级、诊断日志）",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "gpt-sovits",
+    "tts",
+    "voice"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "assets",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "INSTALL.md",
+    "CHANGELOG.md",
+    "PROVENANCE.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "p-queue": "^8.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

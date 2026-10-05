@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Smoke test the build against a stub Cordis context
+        run: node scripts/smoke.mjs
+
+      - name: Verify the package declares a dsh bundle and a plugin export
+        shell: bash
+        run: |
+          node -e "const p=require('./package.json'); if(!p.dsh||!p.dsh.bundle||!p.dsh.bundle.patch){throw new Error('missing dsh.bundle.patch')} console.log('dsh bundle declaration OK')"
+          node -e "const m=require('./lib/index.js'); if(typeof (m.default&&m.default.apply)!=='function'){throw new Error('default export is not a plugin')} console.log('plugin export OK')"
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-sovits-widget-dist
+          path: |
+            lib/
+            assets/
+            cordis.patch.yml
+            package.json

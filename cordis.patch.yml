@@ -1,0 +1,15 @@
+# ============================================================================
+# dsh-sovits-widget —— GPT-SoVITS 语音播报引擎（dsh bundle patch）
+# ============================================================================
+# 挂载声明：DSH 启动时按 bundle 层栈叠加各插件 patch，本文件把
+# 本插件插入配置树（一行双面：宿主 lib/index.js + 客户端 assets 脚本）。
+#
+# 安装方式：
+#   dsh plugin --profile web add dsh-sovits-widget
+# 或本地开发安装：
+#   dsh plugin --profile web add link:<本目录绝对路径>
+# ============================================================================
+
+- insert:
+    - id: dsh-sovits-widget
+      name: dsh-sovits-widget

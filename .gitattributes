@@ -1,0 +1,19 @@
+# 统一换行符，避免跨平台 diff 噪音
+* text=auto eol=lf
+
+# 明确二进制类型
+*.png binary
+*.jpg binary
+*.gif binary
+*.wav binary
+*.mp3 binary
+*.zip binary
+*.ico binary
+
+# 语言统计
+*.ts text
+*.mjs text
+*.cjs text
+*.md text
+*.yml text
+*.json text
