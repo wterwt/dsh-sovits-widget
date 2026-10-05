@@ -40,7 +40,7 @@ const RUNTIME_ENTRIES = [
   'LICENSE',
   'README.md',
   'INSTALL.md',
-  '新手安装指南.md',
+  'BEGINNER-GUIDE.md',
 ];
 
 /** 仅开发包包含。 */
