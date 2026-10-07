@@ -165,6 +165,7 @@ export class ConfigPanel {
     const head = el('div', { class: 'dshs-role-card-head' }, [
       el('div', { class: 'dshs-role-name' }, [`${role.name}${this.config.activeRoleId === role.id ? '（当前）' : ''}`]),
       el('div', { class: 'dshs-console-buttons' }, [
+        el('button', { class: 'dshs-btn', 'data-act': 'preview', title: '试听这个角色的声音' }, ['试听']),
         el('button', { class: 'dshs-btn', 'data-act': 'edit' }, [expanded ? '收起' : '编辑']),
         el('button', { class: 'dshs-btn', 'data-act': 'activate' }, ['启用']),
         el('button', { class: 'dshs-btn dshs-danger', 'data-act': 'delete' }, ['删除']),
@@ -176,6 +177,7 @@ export class ConfigPanel {
       this.editingRoleId = expanded ? null : role.id;
       this.renderVoices();
     });
+    head.querySelector('[data-act="preview"]')?.addEventListener('click', () => void this.previewVoice(role.id));
     head.querySelector('[data-act="activate"]')?.addEventListener('click', () => {
       this.config.activeRoleId = role.id;
       toast(`已切换到角色「${role.name}」（音色与提示词注入同步生效）`);
@@ -376,27 +378,28 @@ export class ConfigPanel {
         el('span', { class: 'dshs-hint' }, ['   将合成“你好，这是音色预览。”']),
       ]),
     );
-    body.querySelector('[data-act="preview"]')?.addEventListener('click', () => {
-      toast('正在合成预览音频…');
-      void (async () => {
-        try {
-          const res = await api.preview('你好，这是音色预览。');
-          if (res.ok && res.token) {
-            const audio = await api.audio(res.token);
-            const blob = await audio.blob();
-            const url = URL.createObjectURL(blob);
-            const player = new Audio(url);
-            player.volume = this.config.playback.volume;
-            void player.play();
-            setTimeout(() => URL.revokeObjectURL(url), 30000);
-          } else {
-            toast(res.error ?? '预览失败', 'error');
-          }
-        } catch (err) {
-          toast(`预览失败: ${err instanceof Error ? err.message : String(err)}`, 'error');
-        }
-      })();
-    });
+    body.querySelector('[data-act="preview"]')?.addEventListener('click', () => void this.previewVoice());
+  }
+
+  /** 试听某个角色的音色（不传 roleId 则用当前激活角色）。 */
+  private async previewVoice(roleId?: string): Promise<void> {
+    toast('正在合成试听音频…');
+    try {
+      const res = await api.preview('你好，这是音色预览。', roleId);
+      if (res.ok && res.token) {
+        const audio = await api.audio(res.token);
+        const blob = await audio.blob();
+        const url = URL.createObjectURL(blob);
+        const player = new Audio(url);
+        player.volume = this.config.playback.volume;
+        void player.play();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      } else {
+        toast(res.error ?? '试听失败', 'error');
+      }
+    } catch (err) {
+      toast(`试听失败: ${err instanceof Error ? err.message : String(err)}`, 'error');
+    }
   }
 
   // ---------- 诊断 ----------

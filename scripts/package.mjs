@@ -60,7 +60,7 @@ const DEV_ENTRIES = [
   '.github',
 ];
 
-/** 永不分发的本机专用文件。 */
+/** 永不分发的本地专用文件。 */
 const EXCLUDE_NAMES = new Set([
   'node_modules',
   '.git',

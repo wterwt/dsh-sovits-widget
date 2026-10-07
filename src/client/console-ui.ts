@@ -1,6 +1,6 @@
 /**
  * 悬浮控制台（播放时显示）：进度条、当前朗读文本高亮、暂停/停止、
- * 语速调节、静音快捷键提示。Esc = 停止（barge-in）。
+ * 音量与语速调节。Esc = 停止（barge-in）。
  */
 
 import { AudioPlayer } from './player.js';
@@ -24,6 +24,7 @@ export class ConsoleUi {
   private titleEl!: HTMLElement;
   private playPauseBtn!: HTMLButtonElement;
   private speedInput!: HTMLInputElement;
+  private volumeInput!: HTMLInputElement;
   private roleLabel!: HTMLElement;
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -64,9 +65,11 @@ export class ConsoleUi {
     const progress = el('div', { class: 'dshs-progress' });
     this.progressFill = el('div', { class: 'dshs-progress-fill' });
     progress.appendChild(this.progressFill);
+    this.volumeInput = el('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(this.player.volumeLevel) }) as HTMLInputElement;
+    const volumeRow = el('div', { class: 'dshs-slider-row' }, [el('span', {}, ['音量']), this.volumeInput]);
     this.speedInput = el('input', { type: 'range', min: '0.5', max: '2', step: '0.05', value: '1' }) as HTMLInputElement;
     const speedRow = el('div', { class: 'dshs-slider-row' }, [el('span', {}, ['语速']), this.speedInput]);
-    root.append(head, this.textEl, progress, speedRow);
+    root.append(head, this.textEl, progress, volumeRow, speedRow);
 
     this.playPauseBtn.addEventListener('click', () => {
       if (this.player.currentState === 'paused') {
@@ -84,6 +87,9 @@ export class ConsoleUi {
     });
     this.speedInput.addEventListener('input', () => {
       this.options.onSpeedChange?.(Number(this.speedInput.value));
+    });
+    this.volumeInput.addEventListener('input', () => {
+      this.player.setVolume(Number(this.volumeInput.value));
     });
     return root;
   }

@@ -8,7 +8,7 @@
 
 ```bat
 pnpm install
-pnpm test          :: 62 个用例应全部通过
+pnpm test          :: 72 个用例应全部通过
 pnpm typecheck     :: 应无错误
 pnpm build         :: 生成 lib/ 与 assets/
 node scripts/smoke.mjs
@@ -157,7 +157,7 @@ npm publish --access public
 
 推送前：
 
-- [ ] `pnpm test` 通过（62 用例）
+- [ ] `pnpm test` 通过（72 用例）
 - [ ] `pnpm typecheck` 无错误
 - [ ] `pnpm build` 成功
 - [ ] `git status` 未包含 `lib/`、`assets/sovits-widget.js`、`node_modules/`

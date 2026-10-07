@@ -34,7 +34,7 @@ const PROBE_TIMEOUT_MS = 5000;
 /**
  * 探测服务端接口代际。
  *
- * 判定依据（实测于本机 v2ProPlus 整合包）：
+ * 判定依据（实测于 v2ProPlus 整合包）：
  * - 新版 api_v2：`GET /tts` 存在（缺参数返回 422/500），`GET /` 返回 404
  * - 旧版 api.py：`GET /` 存在（缺参数返回 400/200），`GET /tts` 返回 404
  *

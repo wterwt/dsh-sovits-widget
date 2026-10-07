@@ -101,6 +101,11 @@ export class AudioPlayer {
     }
   }
 
+  /** 当前音量（0-1）。 */
+  get volumeLevel(): number {
+    return this.volume;
+  }
+
   /** 替换事件回调（UI 挂载后绑定）。 */
   setEvents(events: PlaybackEvents): void {
     this.events = events;
